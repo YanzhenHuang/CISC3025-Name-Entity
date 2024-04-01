@@ -21,6 +21,53 @@ from nltk.classify.maxent import MaxentClassifier
 from sklearn.metrics import (accuracy_score, fbeta_score, precision_score,
                              recall_score)
 
+""" Libraries """
+gc = geonamescache.GeonamesCache()
+week_names = [
+    'MONDAY',
+    'TUESDAY',
+    'WEDNESDAY',
+    'THURSDAY',
+    'FRIDAY',
+    'SATURDAY',
+    'SUNDAY',
+    'MON',
+    'TUE',
+    'WED',
+    'THU',
+    'FRI',
+    'SAT',
+    'SUN'
+]
+month_names = [
+    'JANUARY',
+    'FEBRUARY',
+    'MARCH',
+    'APRIL',
+    'MAY',
+    'JUNE',
+    'JULY',
+    'AUGUST',
+    'SEPTEMBER',
+    'OCTOBER',
+    'NOVEMBER',
+    'DECEMBER',
+    'JAN',
+    'FEB',
+    'MAR',
+    'APR',
+    'MAY',
+    'JUN',
+    'JUL',
+    'AUG',
+    'SEP',
+    'OCT',
+    'NOV',
+    'DEC'
+]
+country_names = [country['name'].upper() for country in gc.get_countries().values()]
+city_names = [city['name'].upper() for city in gc.get_cities().values()]
+stop_words = list(stopwords.words("english"))
 
 
 class MEMM:
@@ -53,82 +100,35 @@ class MEMM:
 
         # ===== TODO: Add your features here ======= #
 
-        """ Libraries """
-        gc = geonamescache.GeonamesCache()
-        week_names = [
-            'MONDAY',
-            'TUESDAY',
-            'WEDNESDAY',
-            'THURSDAY',
-            'FRIDAY',
-            'SATURDAY',
-            'SUNDAY',
-            'MON',
-            'TUE',
-            'WED',
-            'THU',
-            'FRI',
-            'SAT',
-            'SUN'
-        ]
-        month_names = [
-            'JANUARY',
-            'FEBRUARY',
-            'MARCH',
-            'APRIL',
-            'MAY',
-            'JUNE',
-            'JULY',
-            'AUGUST',
-            'SEPTEMBER',
-            'OCTOBER',
-            'NOVEMBER',
-            'DECEMBER',
-            'JAN',
-            'FEB',
-            'MAR',
-            'APR',
-            'MAY',
-            'JUN',
-            'JUL',
-            'AUG',
-            'SEP',
-            'OCT',
-            'NOV',
-            'DEC'
-        ]
-        country_names = [country['name'].upper() for country in gc.get_countries().values()]
-        city_names = [city['name'].upper() for city in gc.get_cities().values()]
-        stop_words = list(stopwords.words("english"))
 
         # ---------- Language Matches ---------- #
         # No Letters
         if re.match(r'[\w|\d]+', current_word):
-            features['no_letters'] = 1
+            features['p_no_letters'] = 1
 
         # All letters capitalized
         if re.match(r'[A-Z]+$', current_word):
-            features['all_capital'] = 1
+            features['p_all_capital'] = 1
 
         # Prefix - A single capital letter followed by a period.
         if re.match(r'[A-Z]\.', current_word):
-            features['prefix'] = 1
+            features['p_prefix'] = 1
 
         # Ends with -ian, -ese
         if re.match(r'ian$|ese$', current_word):
-            features['is_nationality'] = 1
+            features['p_nationality'] = 1
 
         # Score Comparison
         if re.match(r'\d+-\d+', current_word):
-            features['is_score_compare'] = 1
+            features['p_score_compare'] = 1
 
         # Precise date
         if re.match(r'\d{4}-\d{2}-\d{2}', current_word):
-            features['is_ymd'] = 1
+            features['p_ymd'] = 1
 
         # Country Name abbreviation: e.g. U.S., U.K., U.S.S.R.,
         if re.match(r'([A-Z]\.){2,4}', current_word):
-            features['is_country_abbreviation'] = 1
+            features['p_country_abbreviation'] = 1
 
         # ---------- Library elements ---------- #
         # Is week day
@@ -141,11 +141,11 @@ class MEMM:
 
         # Is country name
         if current_word.upper() in country_names:
-            features['country'] = 1
+            features['is_country'] = 1
 
         # Is city name
         if current_word.upper() in city_names:
-            features['city'] = 1
+            features['is_city'] = 1
 
         # Is stop words
         if current_word in stop_words:
