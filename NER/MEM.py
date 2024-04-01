@@ -74,8 +74,8 @@ class MEMM:
     def __init__(self):
         self.train_path = "../data/train"
         self.dev_path = "../data/dev"
-        self.beta = 0
-        self.max_iter = 0
+        self.beta = 0.5             # Used for f-score evaluation
+        self.max_iter = 5
         self.classifier = None
 
     def features(self, words, previous_label, position):
@@ -151,6 +151,9 @@ class MEMM:
         if current_word in stop_words:
             features['is_stop_word'] = 1
 
+        if previous_label == 'PERSON':
+            features['is_previous_person'] = 1
+
         #=============== TODO: Done ================#
         return features
 
@@ -167,19 +170,30 @@ class MEMM:
 
     def train(self):
         print('Training classifier...')
+        # Load word-labels
         words, labels = self.load_data(self.train_path)
         previous_labels = ["O"] + labels
+
+        # Extract Features for all words
         features = [self.features(words, previous_labels[i], i)
                     for i in range(len(words))]
+
+        # Pack word-features to train-samples
         train_samples = [(f, l) for (f, l) in zip(features, labels)]
         classifier = MaxentClassifier.train(
             train_samples, max_iter=self.max_iter)
+
+        # Get weights for all features
         self.classifier = classifier
+        print(classifier)
 
     def test(self):
         print('Testing classifier...')
+        # Load word-labels
         words, labels = self.load_data(self.dev_path)
         previous_labels = ["O"] + labels
+
+        # Extract Features for all words
         features = [self.features(words, previous_labels[i], i)
                     for i in range(len(words))]
         results = [self.classifier.classify(n) for n in features]
