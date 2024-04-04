@@ -2,12 +2,6 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from .NER import playground
 
-# Create your views here.
-
-
-def index(request):
-    return HttpResponse("Hello, world. You're at the polls index. Test!")
-
 
 def nerUI(request):
     return render(request, 'nerUI.html')
