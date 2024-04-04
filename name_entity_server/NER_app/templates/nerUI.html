@@ -22,6 +22,10 @@
     <form action="/result/" method="post">
         {% csrf_token %}
         <div class="input-block">
+            <p>
+                Don't worry if it takes a bit long to load.
+                The running of model takes time. The result will be soon shown.
+            </p>
             <label>Input Query</label><br>
             <textarea name="input-query" class="input-query" rows="4" cols="50"></textarea>
         </div>

@@ -11,6 +11,6 @@ def resultView(request):
     input_query = request.POST.get("input-query", "<blank>")
 
     # Add your name entity processing here!!!
-    output_query = input_query + playground.some_text
+    output_query = input_query + playground.foo()
 
     return HttpResponse("Your Result:\n" + output_query)
