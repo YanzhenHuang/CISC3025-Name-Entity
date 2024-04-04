@@ -19,7 +19,7 @@
 </head>
 <body>
     <h1> Welcome to Name Entity Recognition System! </h1>
-    <form action="/result/" method="post">
+    <form id="query-form" action="/result/" method="post">
         {% csrf_token %}
         <div class="input-block">
             <p>
@@ -31,6 +31,28 @@
         </div>
         <input type="submit" value="Label!!">
     </form>
+
+    <p id="result">
+        <!-- Where you need to write the result.-->
+    </p>
+
+    <script>
+    document.getElementById('query-form').addEventListener('submit', function(event){
+        event.preventDefault();
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/result/', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');
+        xhr.onload = function() {
+            if (this.status == 200) {
+                var response = JSON.parse(this.responseText);
+                document.getElementById('result').innerHTML = response.result;
+            }
+        };
+        var data = new FormData(event.target);
+        xhr.send(new URLSearchParams(data).toString());
+    });
+    </script>
 
 </body>
 </html>

@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.http import JsonResponse
+
 from .NER import playground
 
 
@@ -11,6 +13,6 @@ def resultView(request):
     input_query = request.POST.get("input-query", "<blank>")
 
     # Add your name entity processing here!!!
-    output_query = input_query + playground.foo()
+    output_query = input_query
 
-    return HttpResponse("Your Result:\n" + output_query)
+    return JsonResponse({"result": output_query})
