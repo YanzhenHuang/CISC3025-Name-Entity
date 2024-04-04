@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NER</title>
+    <style>
+        form {
+            display: block;
+        }
+        .input-block{
+            display: block;
+        }
+        .input-query {
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <h1> Welcome to Name Entity Recognition System! </h1>
+    <form action="/NER_app/result/" method="post">
+        {% csrf_token %}
+        <div class="input-block">
+            <label>Input Query</label><br>
+            <textarea name="input-query" class="input-query" rows="4" cols="50"></textarea>
+        </div>
+        <input type="submit" value="Label!!">
+    </form>
+
+</body>
+</html>
