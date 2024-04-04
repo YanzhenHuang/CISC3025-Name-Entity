@@ -72,8 +72,8 @@ stop_words = list(stopwords.words("english"))
 
 class MEMM:
     def __init__(self):
-        self.train_path = "../../../data/train"
-        self.dev_path = "../../../data/dev"
+        self.train_path = "data/train"
+        self.dev_path = "data/dev"
         self.beta = 0.5             # Used for f-score evaluation
         self.max_iter = 5
         self.classifier = None

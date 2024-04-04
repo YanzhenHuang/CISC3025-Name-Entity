@@ -1,10 +1,1 @@
-import nltk
-from nltk.corpus import stopwords
-from MEM import MEMM
-
-model = MEMM()
-
-model.train()
-model.test()
-
-model.show_samples((0, 40))
+some_text = "This text is used to test whether the backend can reach here."
