@@ -13,6 +13,6 @@ def resultView(request):
     input_query = request.POST.get("input-query", "<blank>")
 
     # Add your name entity processing here!!!
-    output_query = input_query
+    output_query = input_query + " ---- from backend"
 
     return JsonResponse({"result": output_query})
