@@ -108,8 +108,6 @@ class MEMM:
 
 
         # ---------- Language Matches ---------- #
-
-
         # McArthur Style
         if re.match(r'(^[A-Z][a-z][A-Z])[A-Za-z]+',current_word):
             features['p_mcarthur_style'] = 1
@@ -192,6 +190,19 @@ class MEMM:
 
         if previous_label == 'PERSON':
             features['is_previous_person'] = 1
+
+        # Position Related
+        if position == 0:
+            features['is_first_word'] = 1
+
+        if position == len(words) - 1:
+            features['is_last_word'] = 1
+
+        if words[position - 1] in stop_words:
+            features['is_after_stop_word'] = 1
+
+        if not position >= len(words) - 1 and words[position + 1] in stop_words:
+            features['is_before_stop_word'] = 1
 
 
         #=============== TODO: Done ================#
@@ -279,28 +290,28 @@ class MEMM:
 
     # Predict the single entity.
     def predict_entities(self, sentence):
-        def tokenize_sentence(_sentence):
-            tokenizer = nltk.tokenize.RegexpTokenizer(r'[\s]+', gaps=True)
-
-            # Unify Punctuation
-            _sentence = re.sub(r'\"|\.\.+|\(|\)|\s--+\s|(?<=[A-Za-z])/|&[a-z]+;|>', ' ', _sentence)
-            _sentence = re.sub(r'(?<![A-Z])([.,?!"]\s+)', ' ', _sentence)
-
-            # Tokenize using unified punctuation
-            _token_array = tokenizer.tokenize(_sentence)
-
-            # Post-process
-            token_array = []
-            for token in _token_array:
-                token = token.rstrip(',?!"-.')
-                token = token.lower()
-                token_array.append(token) if token != "-" or "" else None
-
-            return token_array
+        # def tokenize_sentence(_sentence):
+        #     tokenizer = nltk.tokenize.RegexpTokenizer(r'[\s]+', gaps=True)
+        #
+        #     # Unify Punctuation
+        #     _sentence = re.sub(r'\"|\.\.+|\(|\)|\s--+\s|(?<=[A-Za-z])/|&[a-z]+;|>', ' ', _sentence)
+        #     _sentence = re.sub(r'(?<![A-Z])([.,?!"]\s+)', ' ', _sentence)
+        #
+        #     # Tokenize using unified punctuation
+        #     _token_array = tokenizer.tokenize(_sentence)
+        #
+        #     # Post-process
+        #     token_array = []
+        #     for token in _token_array:
+        #         token = token.rstrip(',?!"-.')
+        #         token = token.lower()
+        #         token_array.append(token) if token != "-" or "" else None
+        #
+        #     return token_array
 
         # Pre-process
-        # words = sentence.split()
-        words = tokenize_sentence(sentence)
+        words = sentence.split()
+        # words = tokenize_sentence(sentence)
 
         # Initialize the previous label to be 'O'
         previous_label = 'O'
