@@ -253,7 +253,7 @@ class MEMM:
         with open(model_pkl_path, 'rb') as f:
             self.classifier = pickle.load(f)
 
-    # 新增predict_entities方法
+    # Predict the single entity.
     def predict_entities(self, sentence):
         # Pre-process
         words = sentence.split()
