@@ -3,7 +3,7 @@ import pickle
 
 def predict(input_sentence, model_py_file, model_pkl_dir=None):
     memm = model_py_file.MEMM()
-    if not model_pkl_dir:
+    if model_pkl_dir is None:
         memm.load_model()
     else:
         with open(model_pkl_dir, 'rb') as f:
