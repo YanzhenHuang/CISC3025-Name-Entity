@@ -65,8 +65,10 @@ month_names = [
     'NOV',
     'DEC'
 ]
-country_names = [country['name'].upper() for country in gc.get_countries().values()]
-city_names = [city['name'].upper() for city in gc.get_cities().values()]
+country_names = [country['name'].upper() for country in gc.get_countries().values()] if gc else []
+country_names.extend(['REPUBLIC', 'KINGDOM'])
+
+city_names = [city['name'].upper() for city in gc.get_cities().values()] if gc else None
 stop_words = list(stopwords.words("english"))
 
 
@@ -103,20 +105,34 @@ class MEMM:
 
         # ---------- Language Matches ---------- #
         # No Letters
-        if re.match(r'[\w|\d]+', current_word):
+        if re.match(r'[\W|\d]+', current_word):
             features['p_no_letters'] = 1
 
         # All letters capitalized
         if re.match(r'[A-Z]+$', current_word):
             features['p_all_capital'] = 1
 
-        # Prefix - A single capital letter followed by a period.
-        if re.match(r'[A-Z]\.', current_word):
+        # All characters are letters
+        if re.match(r'[A-Za-z]+', current_word):
+            features['p_all_letters'] = 1
+
+        # Camel case
+        if re.match(r'^[a-z]+(?:[A-Z][a-z]*)*$', current_word):
+            features['p_camel'] = 1
+
+        # Prefix - First letter cap, then lower. e.g. D., S., Mr., Ms.,...
+        if re.match(r'[A-Z][a-z]*\.', current_word):
             features['p_prefix'] = 1
 
-        # Ends with -ian, -ese
-        if re.match(r'ian$|ese$', current_word):
-            features['p_nationality'] = 1
+        # Special Suffix
+        if re.match(r'ian$|ese$|sh$', current_word):
+            features['p_nationality_like'] = 1
+        elif re.match(r'ist$|th$', current_word):
+            features['p_special_suffix'] = 1
+        elif re.match(r'\'s$', current_word):
+            features['p_possessive_case'] = 1
+        elif re.match(r'([aio]?tion$|ment$|ness$|ship$|\w+age$|[ae]nce$)/i', current_word):
+            features['p_noun_like'] = 1
 
         # Score Comparison
         if re.match(r'\d+-\d+', current_word):
