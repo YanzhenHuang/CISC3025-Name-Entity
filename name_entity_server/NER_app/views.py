@@ -18,8 +18,8 @@ def resultView(request):
     model_pkl_path = os.path.abspath('name_entity_server/static/model.pkl').replace('\\', '/')
 
     # Get modified name string
-    names = playground.predict(input_query, MEM, model_pkl_path)
-    output_query = names + " ---- from backend"
+    names, labels = playground.predict(input_query, MEM, model_pkl_path)
+    output_query = names + " <br> " + labels
 
     # output_query = input_query + " ---- from backend"
     return JsonResponse({"result": output_query})

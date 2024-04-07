@@ -13,6 +13,7 @@ def predict(input_sentence, model_py_file, model_pkl_dir=None):
 
     predicted_labels = memm.predict_entities(input_sentence)
     names = ""
+    debug_predicted_label = ""
 
     # Output Prediction
     print(input_sentence)
@@ -23,7 +24,8 @@ def predict(input_sentence, model_py_file, model_pkl_dir=None):
             names += "*<b>" + word + "</b>* "
         else:
             names += word + " "
+        debug_predicted_label += label + " "
 
     print("\n")
-    return names
+    return names, debug_predicted_label
 
