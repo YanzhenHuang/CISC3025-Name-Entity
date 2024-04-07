@@ -102,7 +102,7 @@ class MEMM:
 
         # First letter capitalized.
         if current_word[0].isupper():
-            features['Titlecase'] = 1
+            features['p_all_capital'] = 1
 
         # ===== TODO: Add your features here ======= #
 
@@ -129,6 +129,10 @@ class MEMM:
         # All characters are letters
         if re.match(r'[A-Za-z]+', current_word):
             features['p_all_letters'] = 1
+
+        # All characters are lowercase
+        if re.match(r'[a-z]+$', current_word):
+            features['p_all_lower'] = 1
 
         # Camel case
         if re.match(r'^[a-z]+(?:[A-Z][a-z]*)*$', current_word):
@@ -174,7 +178,8 @@ class MEMM:
             features['is_month'] = 1
 
         # Is country name
-        if current_word.upper() in country_names:
+        # "China" matches "People's Republic of China"
+        if any(current_word.upper() in country_name for country_name in country_names):
             features['is_country'] = 1
 
         # Is city name
@@ -188,18 +193,6 @@ class MEMM:
         if previous_label == 'PERSON':
             features['is_previous_person'] = 1
 
-        # Position Related
-        # if position == 0:
-        #     features['is_first_word'] = 1
-        #
-        # if position == len(words) - 1:
-        #     features['is_last_word'] = 1
-        #
-        # if words[position - 1] in stop_words:
-        #     features['is_after_stop_word'] = 1
-        #
-        # if not position >= len(words) - 1 and words[position + 1] in stop_words:
-        #     features['is_before_stop_word'] = 1
 
         #=============== TODO: Done ================#
         return features
@@ -299,7 +292,7 @@ class MEMM:
             # Post-process
             token_array = []
             for token in _token_array:
-                token = token.rstrip(',?!"-')
+                token = token.rstrip(',?!"-.')
                 token = token.lower()
                 token_array.append(token) if token != "-" or "" else None
 

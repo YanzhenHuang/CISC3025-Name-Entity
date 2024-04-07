@@ -15,7 +15,7 @@ def resultView(request):
 
     # Add your name entity processing here!!!
     # Please never alter the path!!!!!
-    model_pkl_path = os.path.abspath('name_entity_server/static/model_s.pkl').replace('\\', '/')
+    model_pkl_path = os.path.abspath('name_entity_server/static/model.pkl').replace('\\', '/')
 
     # Get modified name string
     names, labels = playground.predict(input_query, MEM, model_pkl_path)
