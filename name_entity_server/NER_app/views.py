@@ -18,8 +18,8 @@ def resultView(request):
 
     # Add your name entity processing here!!!
     #TODO: Figure out a way to deal with this crap.
-    file_path = 'E:/Courses/CISC3025-Name-Entity/name_entity_server/name_entity_server/static/model.pkl'
-    names = playground.predict(input_query, MEM, file_path)
+    model_pkl_path = os.path.abspath('name_entity_server/static/model.pkl').replace('\\', '/')
+    names = playground.predict(input_query, MEM, model_pkl_path)
     names = "(No names found)" if names == "" else names
     output_query = names + " ---- from backend"
 

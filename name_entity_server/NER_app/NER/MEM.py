@@ -244,26 +244,28 @@ class MEMM:
             print(fmt % (word, pdist.prob('PERSON'), pdist.prob('O')))
 
     def dump_model(self):
-        with open('./model.pkl', 'wb') as f:
+        model_pkl_path = os.path.abspath('../../name_entity_server/static/model.pkl').replace('\\', '/')
+        with open(model_pkl_path, 'wb') as f:
             pickle.dump(self.classifier, f)
 
     def load_model(self):
-        with open('./model.pkl', 'rb') as f:
+        model_pkl_path = os.path.abspath('../../name_entity_server/static/model.pkl').replace('\\', '/')
+        with open(model_pkl_path, 'rb') as f:
             self.classifier = pickle.load(f)
 
     # 新增predict_entities方法
     def predict_entities(self, sentence):
-        # 预处理：将句子按空格分割成单词列表
+        # Pre-process
         words = sentence.split()
 
-        # 初始化前一个标签为'O'（表示非实体）
+        # Initialize the previous label to be 'O'
         previous_label = 'O'
 
-        # 对每个单词应用特征函数，并使用分类器进行预测
+        # Classify each label
         predicted_labels = []
         for position, word in enumerate(words):
             features = self.features(words, previous_label, position)
-            predicted_label = self.classifier.classify(features)
+            predicted_label = self.classifier.classify(features)    # Decide the label
             predicted_labels.append(predicted_label)
             previous_label = predicted_label
 
