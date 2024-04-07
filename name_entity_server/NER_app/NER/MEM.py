@@ -20,6 +20,7 @@ from nltk.corpus import stopwords
 from nltk.classify.maxent import MaxentClassifier
 from sklearn.metrics import (accuracy_score, fbeta_score, precision_score,
                              recall_score)
+from nltk.corpus import names
 
 """ Libraries """
 gc = geonamescache.GeonamesCache()
@@ -66,10 +67,12 @@ month_names = [
     'DEC'
 ]
 country_names = [country['name'].upper() for country in gc.get_countries().values()] if gc else []
-country_names.extend(['REPUBLIC', 'KINGDOM'])
+country_names.extend(['REPUBLIC', 'KINGDOM', 'UNITED', 'STATES'])
 
 city_names = [city['name'].upper() for city in gc.get_cities().values()] if gc else None
 stop_words = list(stopwords.words("english"))
+stored_names = names.words('male.txt') + names.words('female.txt')
+
 
 
 class MEMM:
@@ -104,6 +107,8 @@ class MEMM:
 
 
         # ---------- Language Matches ---------- #
+
+
         # McArthur Style
         if re.match(r'(^[A-Z][a-z][A-Z])[A-Za-z]+',current_word):
             features['p_mcarthur_style'] = 1
@@ -155,6 +160,10 @@ class MEMM:
             features['p_country_abbreviation'] = 1
 
         # ---------- Library elements ---------- #
+        # Is in name list
+        if current_word in stored_names:
+            features['is_in_name_list'] = 1
+
         # Is week day
         if current_word.upper() in week_names:
             features['is_weekday'] = 1
@@ -177,6 +186,19 @@ class MEMM:
 
         if previous_label == 'PERSON':
             features['is_previous_person'] = 1
+
+        # Position Related
+        # if position == 0:
+        #     features['is_first_word'] = 1
+        #
+        # if position == len(words) - 1:
+        #     features['is_last_word'] = 1
+        #
+        # if words[position - 1] in stop_words:
+        #     features['is_after_stop_word'] = 1
+        #
+        # if not position >= len(words) - 1 and words[position + 1] in stop_words:
+        #     features['is_before_stop_word'] = 1
 
         #=============== TODO: Done ================#
         return features
