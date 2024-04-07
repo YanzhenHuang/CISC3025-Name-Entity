@@ -20,7 +20,7 @@ def predict(input_sentence, model_py_file, model_pkl_dir=None):
     for word, label in zip(input_sentence.split(), predicted_labels):
         if label == 'PERSON':
             print(word, end=", ")
-            names += "*" + word + "* "
+            names += "*<b>" + word + "</b>* "
         else:
             names += word + " "
 

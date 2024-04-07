@@ -46,7 +46,7 @@ if __name__ == '__main__':
     #====== Customization ======
     BETA = 0.5
     MAX_ITER = 5
-    BOUND = (0, 20)
+    BOUND = (0, 120)
     #==========================
 
     main()

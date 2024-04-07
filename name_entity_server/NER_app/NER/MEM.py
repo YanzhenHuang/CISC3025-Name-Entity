@@ -104,13 +104,21 @@ class MEMM:
 
 
         # ---------- Language Matches ---------- #
+        # McArthur Style
+        if re.match(r'(^[A-Z][a-z][A-Z])[A-Za-z]+',current_word):
+            features['p_mcarthur_style'] = 1
+
+        # O'Brien Style
+        if re.match(r'^O\'[A-Z][A-Za-z]+', current_word):
+            features['p_o_prime_style'] = 1
+
         # No Letters
         if re.match(r'[\W|\d]+', current_word):
             features['p_no_letters'] = 1
 
-        # All letters capitalized
+        # End letters capitalized
         if re.match(r'[A-Z]+$', current_word):
-            features['p_all_capital'] = 1
+            features['p_ends_capital'] = 1
 
         # All characters are letters
         if re.match(r'[A-Za-z]+', current_word):

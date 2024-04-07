@@ -21,7 +21,6 @@ def resultView(request):
     model_pkl_path = os.path.abspath('name_entity_server/static/model.pkl').replace('\\', '/')
 
     names = playground.predict(input_query, MEM, model_pkl_path)
-    names = "(No names found)" if names == "" else names
     output_query = names + " ---- from backend"
 
     # output_query = input_query + " ---- from backend"
