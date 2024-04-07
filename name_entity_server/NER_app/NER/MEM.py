@@ -191,7 +191,7 @@ class MEMM:
         if previous_label == 'PERSON':
             features['is_previous_person'] = 1
 
-        # Position Related
+        # ------------- Position Related -------------
         if position == 0:
             features['is_first_word'] = 1
 
