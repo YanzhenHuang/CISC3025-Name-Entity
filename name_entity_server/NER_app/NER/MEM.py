@@ -22,7 +22,6 @@ from sklearn.metrics import (accuracy_score, fbeta_score, precision_score,
                              recall_score)
 from nltk.corpus import names
 
-
 """ Libraries """
 gc = geonamescache.GeonamesCache()
 week_names = [
@@ -74,13 +73,40 @@ city_names = [city['name'].upper() for city in gc.get_cities().values()] if gc e
 stop_words = list(stopwords.words("english"))
 stored_names = names.words('male.txt') + names.words('female.txt')
 
+""" Match Patterns """
+pattern_features = {
+    # McArthur style
+    'p_mcarthur_style': re.compile(r'(^[A-Z][a-z][A-Z])[A-Za-z]+'),
+
+    # O'Brien style
+    'p_o_prime_style': re.compile(r'^O\'[A-Z][A-Za-z]+'),
+
+    # Name-like prefix      e.g. Mr., Ms., Mrs., ...
+    'p_name_prefix': re.compile(r'[A-Z][a-z]{1,3}\.'),
+
+    # Nationality-like
+    'p_nationality_like': re.compile(r'ian$|ese$|sh$'),
+
+    # Noun like
+    'p_noun_like': re.compile(r'([aio]?tion$|ment$|ness$|ship$|\w+age$|[ae]nce$)/i'),
+
+    # Possessive case like
+    'p_possessive_like': re.compile(r'\'s$'),
+
+    # Country Abbreviation like
+    'p_country_abbrev_like': re.compile(r'([A-Z]\.){2,5}'),
+
+    # Numeric description with slashes
+    'p_num_slash': re.compile(r'(\d+-)+\d+'),
+
+}
 
 
 class MEMM:
     def __init__(self):
         self.train_path = "data/train"
         self.dev_path = "data/dev"
-        self.beta = 0.5             # Used for f-score evaluation
+        self.beta = 0.5  # Used for f-score evaluation
         self.max_iter = 5
         self.classifier = None
 
@@ -97,8 +123,8 @@ class MEMM:
         features = {}
         """ Baseline Features """
         current_word = words[position]
-        features['has_(%s)' % current_word] = 1         # has_current_word
-        features['prev_label'] = previous_label         # previous label
+        features['has_(%s)' % current_word] = 1  # has_current_word
+        features['prev_label'] = previous_label  # previous label
 
         # First letter capitalized.
         if current_word[0].isupper():
@@ -106,61 +132,10 @@ class MEMM:
 
         # ===== TODO: Add your features here ======= #
 
-
         # ---------- Language Matches ---------- #
-        # McArthur Style
-        if re.match(r'(^[A-Z][a-z][A-Z])[A-Za-z]+',current_word):
-            features['p_mcarthur_style'] = 1
-
-        # O'Brien Style
-        if re.match(r'^O\'[A-Z][A-Za-z]+', current_word):
-            features['p_o_prime_style'] = 1
-
-        # No Letters
-        if re.match(r'[\W|\d]+', current_word):
-            features['p_no_letters'] = 1
-
-        # End letters capitalized
-        if re.match(r'[A-Z]+$', current_word):
-            features['p_ends_capital'] = 1
-
-        # All characters are letters
-        if re.match(r'[A-Za-z]+', current_word):
-            features['p_all_letters'] = 1
-
-        # All characters are lowercase
-        if re.match(r'[a-z]+$', current_word):
-            features['p_all_lower'] = 1
-
-        # Camel case
-        if re.match(r'^[a-z]+(?:[A-Z][a-z]*)*$', current_word):
-            features['p_camel'] = 1
-
-        # Prefix - First letter cap, then lower. e.g. D., S., Mr., Ms.,...
-        if re.match(r'[A-Z][a-z]*\.', current_word):
-            features['p_prefix'] = 1
-
-        # Special Suffix
-        if re.match(r'ian$|ese$|sh$', current_word):
-            features['p_nationality_like'] = 1
-        elif re.match(r'ist$|th$', current_word):
-            features['p_special_suffix'] = 1
-        elif re.match(r'\'s$', current_word):
-            features['p_possessive_case'] = 1
-        elif re.match(r'([aio]?tion$|ment$|ness$|ship$|\w+age$|[ae]nce$)/i', current_word):
-            features['p_noun_like'] = 1
-
-        # Score Comparison
-        if re.match(r'\d+-\d+', current_word):
-            features['p_score_compare'] = 1
-
-        # Precise date
-        if re.match(r'\d{4}-\d{2}-\d{2}', current_word):
-            features['p_ymd'] = 1
-
-        # Country Name abbreviation: e.g. U.S., U.K., U.S.S.R.,
-        if re.match(r'([A-Z]\.){2,4}', current_word):
-            features['p_country_abbreviation'] = 1
+        for feature_name, feature_pattern in pattern_features.items():
+            if re.match(feature_pattern, current_word):
+                features[feature_name] = 1
 
         # ---------- Library elements ---------- #
         # Is in name list
@@ -175,14 +150,10 @@ class MEMM:
         if current_word.upper() in month_names:
             features['is_month'] = 1
 
-        # Is country name
+        # Is location name: Country + City
         # "China" matches "People's Republic of China"
-        if any(current_word.upper() in country_name for country_name in country_names):
-            features['is_country'] = 1
-
-        # Is city name
-        if current_word.upper() in city_names:
-            features['is_city'] = 1
+        if any(current_word.upper() in country_name for country_name in country_names) or current_word.upper() in city_names:
+            features['is_location'] = 1
 
         # Is stop words
         if current_word in stop_words:
@@ -191,21 +162,23 @@ class MEMM:
         if previous_label == 'PERSON':
             features['is_previous_person'] = 1
 
-        # ------------- Position Related -------------
-        if position == 0:
-            features['is_first_word'] = 1
+        if previous_label == 'O':
+            features['is_previous_other'] = 1
 
-        if position == len(words) - 1:
-            features['is_last_word'] = 1
+        # # ------------- Position Related -------------
+        # if position == 0:
+        #     features['is_first_word'] = 1
+        #
+        # if position == len(words) - 1:
+        #     features['is_last_word'] = 1
+        #
+        # if words[position - 1] in stop_words:
+        #     features['is_after_stop_word'] = 1
+        #
+        # if not position >= len(words) - 1 and words[position + 1] in stop_words:
+        #     features['is_before_stop_word'] = 1
 
-        if words[position - 1] in stop_words:
-            features['is_after_stop_word'] = 1
-
-        if not position >= len(words) - 1 and words[position + 1] in stop_words:
-            features['is_before_stop_word'] = 1
-
-
-        #=============== TODO: Done ================#
+        # =============== TODO: Done ================#
         return features
 
     def load_data(self, filename):
@@ -213,7 +186,7 @@ class MEMM:
         labels = []
         for line in open(filename, "r", encoding="utf-8"):
             doublet = line.strip().split("\t")
-            if len(doublet) < 2:     # remove emtpy lines
+            if len(doublet) < 2:  # remove emtpy lines
                 continue
             words.append(doublet[0])
             labels.append(doublet[1])
@@ -320,8 +293,64 @@ class MEMM:
         predicted_labels = []
         for position, word in enumerate(words):
             features = self.features(words, previous_label, position)
-            predicted_label = self.classifier.classify(features)    # Decide the label
+            predicted_label = self.classifier.classify(features)  # Decide the label
             predicted_labels.append(predicted_label)
             previous_label = predicted_label
 
         return predicted_labels
+
+
+
+        # # McArthur Style
+        # if re.match(r'(^[A-Z][a-z][A-Z])[A-Za-z]+', current_word):
+        #     features['p_mcarthur_style'] = 1
+        #
+        # # O'Brien Style
+        # if re.match(r'^O\'[A-Z][A-Za-z]+', current_word):
+        #     features['p_o_prime_style'] = 1
+        #
+        # # No Letters
+        # if re.match(r'[\W|\d]+', current_word):
+        #     features['p_no_letters'] = 1
+
+        # # End letters capitalized
+        # if re.match(r'[A-Z]+$', current_word):
+        #     features['p_ends_capital'] = 1
+
+        # # All characters are letters
+        # if re.match(r'[A-Za-z]+', current_word):
+        #     features['p_all_letters'] = 1
+
+        # # All characters are lowercase
+        # if re.match(r'[a-z]+$', current_word):
+        #     features['p_all_lower'] = 1
+
+        # # Camel case
+        # if re.match(r'^[a-z]+(?:[A-Z][a-z]*)*$', current_word):
+        #     features['p_camel'] = 1
+
+        # Prefix - First letter cap, then lower. e.g. D., S., Mr., Ms.,...
+        # if re.match(r'[A-Z][a-z]{1,3}\.', current_word):
+        #     features['p_prefix'] = 1
+
+        # # Special Suffix
+        # if re.match(r'ian$|ese$|sh$', current_word):
+        #     features['p_nationality_like'] = 1
+        # elif re.match(r'ist$|th$', current_word):
+        #     features['p_special_suffix'] = 1
+        # elif re.match(r'\'s$', current_word):
+        #     features['p_possessive_case'] = 1
+        # elif re.match(r'([aio]?tion$|ment$|ness$|ship$|\w+age$|[ae]nce$)/i', current_word):
+        #     features['p_noun_like'] = 1
+
+        # Score Comparison
+        # if re.match(r'\d+-\d+', current_word):
+        #     features['p_score_compare'] = 1
+        #
+        # # Precise date
+        # if re.match(r'\d{4}-\d{2}-\d{2}', current_word):
+        #     features['p_ymd'] = 1
+        #
+        # # Country Name abbreviation: e.g. U.S., U.K., U.S.S.R.,
+        # if re.match(r'([A-Z]\.){2,5}', current_word):
+        #     features['p_country_abbreviation'] = 1

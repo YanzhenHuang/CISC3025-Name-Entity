@@ -19,7 +19,11 @@ def resultView(request):
 
     # Get modified name string
     names, labels = playground.predict(input_query, MEM, model_pkl_path)
-    output_query = names + " <br> " + labels
+    output_query = (
+            names
+            + " <br> "
+            # + labels
+    )
 
     # output_query = input_query + " ---- from backend"
     return JsonResponse({"result": output_query})
