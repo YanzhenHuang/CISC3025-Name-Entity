@@ -66,6 +66,7 @@ month_names = [
     'NOV',
     'DEC'
 ]
+
 country_names = [country['name'].upper() for country in gc.get_countries().values()] if gc else []
 country_names.extend(['REPUBLIC', 'KINGDOM', 'UNITED', 'STATES'])
 
@@ -143,12 +144,8 @@ class MEMM:
             features['is_in_name_list'] = 1
 
         # Is week day
-        if current_word.upper() in week_names:
-            features['is_weekday'] = 1
-
-        # Is month name
-        if current_word.upper() in month_names:
-            features['is_month'] = 1
+        if current_word.upper() in week_names or current_word.upper() in month_names:
+            features['is_time'] = 1
 
         # Is location name: Country + City
         # "China" matches "People's Republic of China"
