@@ -156,8 +156,8 @@ class MEMM:
         if current_word in stop_words:
             features['is_stop_word'] = 1
 
-        if previous_label == 'PERSON':
-            features['is_previous_person'] = 1
+        # if previous_label == 'PERSON':
+        #     features['is_previous_person'] = 1
 
         if previous_label == 'O':
             features['is_previous_other'] = 1
