@@ -1,7 +1,10 @@
 # CISC3003 Project 3 Name Entity Recognition
 ## Tips for running this project
-1. **Prerequisites:** Python 3.12 is **Mandatory!** Running in lower versions of Python, even in 3.11, may cause issues like 
+1. **Prerequisites:** 
+- Python 3.12 is **Mandatory!** Running in lower versions of Python, even in 3.11, may cause issues like 
 `cannot import name 'LokyProcess'`. It is a thread-level issue which is probably caused by a version error and can't be fixed.
+- PyCharm is the recommended IDE.
+- All the packages installed, including `Django`, `nltk` should be the **latest**. The latest `Django` package should be 5.0.4.
 
 2. **Packages:** Now, under python environment 3.12, make sure you installed `Django` package for the backend, 
 along with other packages, including: 
