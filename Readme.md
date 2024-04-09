@@ -11,9 +11,8 @@
 
 There might be more dependent packages. When you start the server (I will illustrate below how to start a server), you will be informed which one is missing and you can simply add it using either `pip`, PyCharm Package manager, or `nltk.download('corporaname')`, for those missing `ntlk` corporas.
 
-3. Now, if you are quite sure you have no packages left, please `cd name_entity_server` in console, and run `python -m manage.py runserver`. If you meet an error, try one of the following.
+3. Now, if you are quite sure you have no packages left, please `cd name_entity_server` in console, and run `python -m manage runserver`. If you meet an error, try one of the following.
 
-- `python -m manage runserver`
 - `python manage.py runserver`
 - `python manage runserver`
 
