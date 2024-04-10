@@ -22,7 +22,7 @@ from sklearn.metrics import (accuracy_score, fbeta_score, precision_score,
                              recall_score)
 from nltk.corpus import names
 
-""" Libraries """
+""" Libraries for feature selection """
 gc = geonamescache.GeonamesCache()
 week_names = [
     'MONDAY',
