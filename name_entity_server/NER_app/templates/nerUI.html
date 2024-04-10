@@ -13,19 +13,33 @@
         }
         .input-query {
             resize: vertical;
-            margin: 0 auto;
-            width: 80%;
         }
         .response-box,
         .input-query{
+            display: block;
+            width: 100%;
+            margin: 0 auto;
+
             border-style: solid;
             border-width: 3px;
             border-color: #5c83b5;
+
             min-height: 30px;
             border-radius: 7px;
             padding: 5px;
         }
+        .title-textfield {
+            margin: 0 auto;
+            width: 90%;
+        }
+        .button-container{
+            display: block;
+            justify-content: center;
+            padding: 10px;
+        }
         .btn{
+            display: block;
+            margin: 0 auto;
             background: #5c83b5;
             color: white;
             border-style: none;
@@ -48,16 +62,22 @@
                 Don't worry if it takes a bit long to load.
                 The running of model takes time. The result will be soon shown.
             </p>
-            <h3> Input </h3>
-            <textarea name="input-query" class="input-query" rows="4" cols="50"></textarea>
+            <div class="title-textfield">
+                <h3> Input </h3>
+                <textarea name="input-query" class="input-query" rows="4" cols="50"></textarea>
+            </div>
         </div>
-        <input class="btn" type="submit" value="Label!!">
+        <div class="button-container">
+            <input class="btn" type="submit" value="Label">
+        </div>
     </form>
 
-    <h3>Result:</h3>
-    <p id="result" class="response-box">
-        <!-- Where you need to write the result.-->
-    </p>
+    <div class="title-textfield">
+        <h3>Result:</h3>
+        <p id="result" class="response-box">
+            <!-- Where you need to write the result.-->
+        </p>
+    </div>
 
     <!-- Post form and get Result -->
     <script>
