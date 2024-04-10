@@ -63,18 +63,24 @@
     <script>
     document.getElementById('query-form').addEventListener('submit', function(event){
         event.preventDefault();
-        var xhr = new XMLHttpRequest();
+
+        // Initialize a request obj.
+        let xhr = new XMLHttpRequest();
         xhr.open('POST', '/result/', true);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');
+
+        // Async. Response Handler event listener.
         xhr.onload = function() {
-            if (this.status == 200) {
-                var response = JSON.parse(this.responseText);
+            if (this.status === 200) {
+                let response = JSON.parse(this.responseText);
                 document.getElementById('result').innerHTML = response.result;
             }
         };
-        var data = new FormData(event.target);
-        xhr.send(new URLSearchParams(data).toString());
+
+        // Send form data.
+        let formData = new FormData(event.target);
+        xhr.send(new URLSearchParams(formData).toString());
     });
     </script>
 
