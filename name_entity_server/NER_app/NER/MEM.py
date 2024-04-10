@@ -76,29 +76,32 @@ stored_names = names.words('male.txt') + names.words('female.txt')
 
 """ Match Patterns """
 pattern_features = {
-    # McArthur style
-    'p_mcarthur_style': re.compile(r'(^[A-Z][a-z][A-Z])[A-Za-z]+'),
 
-    # O'Brien style
-    'p_o_prime_style': re.compile(r'^O\'[A-Z][A-Za-z]+'),
+    # + Start with Capital-lowercase, and the rest letters are lowercase.
+    'p_cap_low': re.compile(r'[A-Z](\'|[A-Z])?[a-z]+'),
 
-    # Name-like prefix      e.g. Mr., Ms., Mrs., ...
-    'p_name_prefix': re.compile(r'[A-Z][a-z]{1,3}\.'),
+    # + Single capital letter followed by a period. e.g. D., L., ... Initials of human name.
+    'p_cap_period': re.compile(r'^[A-Z]\.$'),
 
-    # Nationality-like
-    'p_nationality_like': re.compile(r'ian$|ese$|sh$'),
+    # - Person status prefix.      e.g. Mr., Ms., Mrs., ...
+    'p_name_prefix': re.compile(r'M[a-z]{1,3}\.'),
 
-    # Noun like
-    'p_noun_like': re.compile(r'([aio]?tion$|ment$|ness$|ship$|\w+age$|[ae]nce$)/i'),
+    # - All capital letters.
+    'p_all_cap': re.compile(r'^[A-Z]+$'),
 
-    # Possessive case like
+    # - Noun suffixes. e.g. option, movement, tidiness, friendship, childhood, usage, allowance.
+    'p_noun_like': re.compile(r'(([aio]?tion|ment|ness|ship|hood|\w+age|[ae]nce)s?$)/i'),
+
+    # - Possessive case. e.g. 's, ....
     'p_possessive_like': re.compile(r'\'s$'),
 
-    # Country Abbreviation like
-    'p_country_abbrev_like': re.compile(r'([A-Z]\.){2,5}'),
+    # - Location name abbreviation. U.S., U.K., D.C.,  ...
+    'p_country_abbrev_like': re.compile(r'([A-Z]\.){2,3}'),
 
-    # Numeric description with slashes
-    'p_num_slash': re.compile(r'(\d+-)+\d+'),
+    # - Numeric expressions.
+    'p_num_slash': re.compile(r'(\d+-)+\d+|\+\d+|\d+|\d+\.\d+'),
+
+    # "No vowels" is good, but it is not too common in actual use.
 
 }
 
@@ -149,7 +152,10 @@ class MEMM:
 
         # Is location name: Country + City
         # "China" matches "People's Republic of China"
-        if any(current_word.upper() in country_name for country_name in country_names) or current_word.upper() in city_names:
+        if (
+                any(current_word.upper() in country_name for country_name in country_names) or
+                current_word.upper() in city_names
+        ):
             features['is_location'] = 1
 
         # Is stop words
