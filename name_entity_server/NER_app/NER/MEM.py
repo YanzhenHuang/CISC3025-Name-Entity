@@ -169,17 +169,25 @@ class MEMM:
             features['is_previous_other'] = 1
 
         # # ------------- Position Related -------------
-        # if position == 0:
-        #     features['is_first_word'] = 1
-        #
-        # if position == len(words) - 1:
-        #     features['is_last_word'] = 1
-        #
+        if words[position-1] == "." or words[position-2] == ".":
+            features['is_around_first'] = 1
+
+        if position == len(words) - 1:
+            features['is_last_word'] = 1
+
+        if position < len(words) - 2 and words[position+1] == "," and words[position+2] == "who":
+            features['is_target_of_claus'] = 1
+
+        # if words[position+1] == "verb":
+        #     features['is_after_verb'] = 1
+
         # if words[position - 1] in stop_words:
         #     features['is_after_stop_word'] = 1
         #
         # if not position >= len(words) - 1 and words[position + 1] in stop_words:
         #     features['is_before_stop_word'] = 1
+
+
 
         # =============== TODO: Done ================#
         return features
