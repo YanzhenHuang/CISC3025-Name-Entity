@@ -169,7 +169,7 @@ class MEMM:
             features['is_previous_other'] = 1
 
         # # ------------- Position Related -------------
-        if words[position-1] == "." or words[position-2] == ".":
+        if (position > 0 and words[position-1] == ".") or (position > 1 and words[position-2] == "."):
             features['is_around_first'] = 1
 
         if position == len(words) - 1:
