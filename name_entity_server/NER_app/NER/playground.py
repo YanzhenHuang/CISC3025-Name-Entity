@@ -21,9 +21,9 @@ def predict(input_sentence, model_py_file, model_pkl_dir=None):
     for word, label in zip(input_sentence.split(), predicted_labels):
         if label == 'PERSON':
             print(word, end=", ")
-            names += "*<b>" + word + "</b>* "
+            names += '<span style="background-color: #bce7ac">' + "<b>" + word + "</b>" + "</span>" + " · "
         else:
-            names += word + " "
+            names += word + " · "
         debug_predicted_label += label + " "
 
     print("\n")
