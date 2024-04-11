@@ -169,14 +169,17 @@ class MEMM:
             features['is_previous_other'] = 1
 
         # # ------------- Position Related -------------
+        # Is around the first place in a sentence.
         if (position > 0 and words[position-1] == ".") or (position > 1 and words[position-2] == "."):
             features['is_around_first'] = 1
 
+        # Is the last word
         if position == len(words) - 1:
             features['is_last_word'] = 1
 
+        # + Is target of restricted attribute clause. Usefulness proved.
         if position < len(words) - 2 and words[position+1] == "," and words[position+2] == "who":
-            features['is_target_of_claus'] = 1
+            features['is_target_of_clause'] = 1
 
         # if words[position+1] == "verb":
         #     features['is_after_verb'] = 1
