@@ -21,7 +21,7 @@ def resultView(request):
     names, labels = playground.predict(input_query, MEM, model_pkl_path)
     output_query = (
             names
-            + " <br> "
+            # + " <br> "
             # + labels
     )
 
