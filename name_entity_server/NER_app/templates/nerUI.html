@@ -105,6 +105,7 @@
         <!-- Submission Form -->
         <form id="query-form" action="/result/" method="post">
             {% csrf_token %}
+
             <!-- Input Field -->
             <div class="input-block">
                 <p id="operation-instruction-text">
@@ -139,43 +140,43 @@
 <!-- Post form and get Result -->
 <script>
     // On Submit
-document.getElementById('query-form').addEventListener('submit', function(event){
-    event.preventDefault();
+    document.getElementById('query-form').addEventListener('submit', function(event){
+        event.preventDefault();
 
-    // Encapsulate form data.
-    let formData = new FormData(event.target);
-    if(formData.get("input-query") === ""){
-        // Nothing in the input query.
-        return;
-    }
-
-    // Initialize a request obj.
-    let xhr = new XMLHttpRequest();
-
-    // Specify values for the request.
-    xhr.open('POST', '/result/', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');
-
-    // Async. Register a response Handler event listener.
-    xhr.onload = function() {
-        if (this.status === 200) {
-            let response = JSON.parse(this.responseText);
-            document.getElementById('result').innerHTML = response.result;
-            document.getElementById('result').classList.remove('empty-field');
+        // Encapsulate form data.
+        let formData = new FormData(event.target);
+        if(formData.get("input-query") === ""){
+            // Nothing in the input query.
+            return;
         }
-    };
 
-    // Send form data.
-    document.getElementById('result').classList.add('empty-field');
-    document.getElementById('result').innerHTML = "Processing...";
-    xhr.send(new URLSearchParams(formData).toString());
-});
+        // Initialize a request obj.
+        let xhr = new XMLHttpRequest();
 
-// On Clear
-document.getElementById('query-form').addEventListener('reset', function(event){
-    document.getElementById('result').innerHTML = "The result would be shown here.";
-    document.getElementById('result').classList.add('empty-field');
-})
+        // Specify values for the request.
+        xhr.open('POST', '/result/', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');
+
+        // Async. Register a response Handler event listener.
+        xhr.onload = function() {
+            if (this.status === 200) {
+                let response = JSON.parse(this.responseText);
+                document.getElementById('result').innerHTML = response.result;
+                document.getElementById('result').classList.remove('empty-field');
+            }
+        };
+
+        // Send form data.
+        document.getElementById('result').classList.add('empty-field');
+        document.getElementById('result').innerHTML = "Processing...";
+        xhr.send(new URLSearchParams(formData).toString());
+    });
+
+    // On Clear
+    document.getElementById('query-form').addEventListener('reset', function(event){
+        document.getElementById('result').innerHTML = "The result would be shown here.";
+        document.getElementById('result').classList.add('empty-field');
+    })
 </script>
 </html>
