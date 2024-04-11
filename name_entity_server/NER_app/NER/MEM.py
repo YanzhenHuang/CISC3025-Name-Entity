@@ -84,22 +84,22 @@ pattern_features = {
     'p_cap_period': re.compile(r'^[A-Z]\.$'),
 
     # - Person status prefix.      e.g. Mr., Ms., Mrs., ...
-    'p_name_prefix': re.compile(r'M[a-z]{1,3}\.'),
+    # 'p_name_prefix': re.compile(r'M[a-z]{1,3}\.'),
 
     # - All capital letters.
-    'p_all_cap': re.compile(r'^[A-Z]+$'),
+    # 'p_all_cap': re.compile(r'^[A-Z]+$'),
 
     # - Noun suffixes. e.g. option, movement, tidiness, friendship, childhood, usage, allowance.
-    'p_noun_like': re.compile(r'(([aio]?tion|ment|ness|ship|hood|\w+age|[ae]nce)s?$)/i'),
+    'p_noun_like': re.compile(r'(([aio]?tion|ment|ness|ship|hood|\w+age|[ae]nce)[sd]?$)/i'),
 
-    # - Possessive case. e.g. 's, ....
-    'p_possessive_like': re.compile(r'\'s$'),
+    # # - Possessive case. e.g. 's, ....
+    # 'p_possessive_like': re.compile(r'\'s$'),
 
-    # - Location name abbreviation. U.S., U.K., D.C.,  ...
-    'p_country_abbrev_like': re.compile(r'([A-Z]\.){2,3}'),
+    # # - Location name abbreviation. U.S., U.K., D.C.,  ...
+    # 'p_country_abbrev_like': re.compile(r'([A-Z]\.){2,3}'),
 
-    # - Numeric expressions.
-    'p_num_slash': re.compile(r'(\d+-)+\d+|\+\d+|\d+|\d+\.\d+'),
+    # # - Numeric expressions.
+    # 'p_num_slash': re.compile(r'(\d+-)+\d+|\+\d+|\d+|\d+\.\d+'),
 
     # "No vowels" is good, but it is not too common in actual use.
 
@@ -165,8 +165,8 @@ class MEMM:
         # if previous_label == 'PERSON':
         #     features['is_previous_person'] = 1
 
-        if previous_label == 'O':
-            features['is_previous_other'] = 1
+        # if previous_label == 'O':
+        #     features['is_previous_other'] = 1
 
         # # ------------- Position Related -------------
         # Is around the first place in a sentence.
@@ -174,12 +174,20 @@ class MEMM:
         #     features['is_around_first'] = 1
 
         # Is the last word
-        if position == len(words) - 1:
-            features['is_last_word'] = 1
+        # if position == len(words) - 1:
+        #     features['is_last_word'] = 1
 
         # + Is target of restricted attribute clause. Usefulness proved.
         if position < len(words) - 2 and words[position+1] == "," and words[position+2] == "who":
             features['is_target_of_clause'] = 1
+
+        # # Is after name prefix
+        # if position < len(words) - 1 and re.match(r'M[a-z]{1,3}\.', words[position-1]):
+        #     features['is_after_name_prefix'] = 1
+
+        # + Is in possessive case
+        # if position < len(words) -1 and words[position+1] == "'s":
+        #     features['is_possessive'] = 1
 
         # if words[position+1] == "verb":
         #     features['is_after_verb'] = 1
@@ -312,59 +320,3 @@ class MEMM:
             previous_label = predicted_label
 
         return predicted_labels
-
-
-
-        # # McArthur Style
-        # if re.match(r'(^[A-Z][a-z][A-Z])[A-Za-z]+', current_word):
-        #     features['p_mcarthur_style'] = 1
-        #
-        # # O'Brien Style
-        # if re.match(r'^O\'[A-Z][A-Za-z]+', current_word):
-        #     features['p_o_prime_style'] = 1
-        #
-        # # No Letters
-        # if re.match(r'[\W|\d]+', current_word):
-        #     features['p_no_letters'] = 1
-
-        # # End letters capitalized
-        # if re.match(r'[A-Z]+$', current_word):
-        #     features['p_ends_capital'] = 1
-
-        # # All characters are letters
-        # if re.match(r'[A-Za-z]+', current_word):
-        #     features['p_all_letters'] = 1
-
-        # # All characters are lowercase
-        # if re.match(r'[a-z]+$', current_word):
-        #     features['p_all_lower'] = 1
-
-        # # Camel case
-        # if re.match(r'^[a-z]+(?:[A-Z][a-z]*)*$', current_word):
-        #     features['p_camel'] = 1
-
-        # Prefix - First letter cap, then lower. e.g. D., S., Mr., Ms.,...
-        # if re.match(r'[A-Z][a-z]{1,3}\.', current_word):
-        #     features['p_prefix'] = 1
-
-        # # Special Suffix
-        # if re.match(r'ian$|ese$|sh$', current_word):
-        #     features['p_nationality_like'] = 1
-        # elif re.match(r'ist$|th$', current_word):
-        #     features['p_special_suffix'] = 1
-        # elif re.match(r'\'s$', current_word):
-        #     features['p_possessive_case'] = 1
-        # elif re.match(r'([aio]?tion$|ment$|ness$|ship$|\w+age$|[ae]nce$)/i', current_word):
-        #     features['p_noun_like'] = 1
-
-        # Score Comparison
-        # if re.match(r'\d+-\d+', current_word):
-        #     features['p_score_compare'] = 1
-        #
-        # # Precise date
-        # if re.match(r'\d{4}-\d{2}-\d{2}', current_word):
-        #     features['p_ymd'] = 1
-        #
-        # # Country Name abbreviation: e.g. U.S., U.K., U.S.S.R.,
-        # if re.match(r'([A-Z]\.){2,5}', current_word):
-        #     features['p_country_abbreviation'] = 1
