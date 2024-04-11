@@ -170,8 +170,8 @@ class MEMM:
 
         # # ------------- Position Related -------------
         # Is around the first place in a sentence.
-        if (position > 0 and words[position-1] == ".") or (position > 1 and words[position-2] == "."):
-            features['is_around_first'] = 1
+        # if (position > 0 and words[position-1] == ".") or (position > 1 and words[position-2] == "."):
+        #     features['is_around_first'] = 1
 
         # Is the last word
         if position == len(words) - 1:
