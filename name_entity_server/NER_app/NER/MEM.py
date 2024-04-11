@@ -83,27 +83,28 @@ pattern_features = {
     # + Single capital letter followed by a period. e.g. D., L., ... Initials of human name.
     'p_cap_period': re.compile(r'^[A-Z]\.$'),
 
-    # - Person status prefix.      e.g. Mr., Ms., Mrs., ...
-    # 'p_name_prefix': re.compile(r'M[a-z]{1,3}\.'),
-
-    # - All capital letters.
-    # 'p_all_cap': re.compile(r'^[A-Z]+$'),
-
     # - Noun suffixes. e.g. option, movement, tidiness, friendship, childhood, usage, allowance.
     'p_noun_like': re.compile(r'(([aio]?tion|ment|ness|ship|hood|\w+age|[ae]nce)[sd]?$)/i'),
 
-    # # - Possessive case. e.g. 's, ....
-    # 'p_possessive_like': re.compile(r'\'s$'),
-
-    # # - Location name abbreviation. U.S., U.K., D.C.,  ...
-    # 'p_country_abbrev_like': re.compile(r'([A-Z]\.){2,3}'),
-
-    # # - Numeric expressions.
-    # 'p_num_slash': re.compile(r'(\d+-)+\d+|\+\d+|\d+|\d+\.\d+'),
-
-    # "No vowels" is good, but it is not too common in actual use.
-
 }
+
+"""
+- Person status prefix.      e.g. Mr., Ms., Mrs., ...
+'p_name_prefix': re.compile(r'M[a-z]{1,3}\.'),
+
+- All capital letters.
+'p_all_cap': re.compile(r'^[A-Z]+$'),
+# - Possessive case. e.g. 's, ....
+'p_possessive_like': re.compile(r'\'s$'),
+
+# - Location name abbreviation. U.S., U.K., D.C.,  ...
+'p_country_abbrev_like': re.compile(r'([A-Z]\.){2,3}'),
+
+# - Numeric expressions.
+'p_num_slash': re.compile(r'(\d+-)+\d+|\+\d+|\d+|\d+\.\d+'),
+
+No vowels is good, but it is not too common in actual use.
+"""
 
 
 class MEMM:
@@ -123,6 +124,24 @@ class MEMM:
                 of a new sentence)
         :param position: the word you are adding features for
         """
+
+        def get_non_name_bool():
+            non_name_bool = (
+                # Week names: Monday, Tuesday, ...
+                current_word.upper() in week_names or current_word.upper() in month_names or
+                # Month Names: January, February, ...
+                current_word.upper() in week_names or current_word.upper() in month_names or
+
+                # Is location name: Country + City
+                # "China" matches "People's Republic of China"
+                (any(current_word.upper() in country_name for country_name in country_names) or
+                    current_word.upper() in city_names
+                ) or
+
+                # Stop words: prep, adj, ...
+                current_word in stop_words
+            )
+            return non_name_bool
 
         features = {}
         """ Baseline Features """
@@ -146,59 +165,49 @@ class MEMM:
         if current_word in stored_names:
             features['is_in_name_list'] = 1
 
-        # Is week day
-        if current_word.upper() in week_names or current_word.upper() in month_names:
-            features['is_time'] = 1
-
-        # Is location name: Country + City
-        # "China" matches "People's Republic of China"
-        if (
-                any(current_word.upper() in country_name for country_name in country_names) or
-                current_word.upper() in city_names
-        ):
-            features['is_location'] = 1
-
-        # Is stop words
-        if current_word in stop_words:
-            features['is_stop_word'] = 1
-
-        # if previous_label == 'PERSON':
-        #     features['is_previous_person'] = 1
-
-        # if previous_label == 'O':
-        #     features['is_previous_other'] = 1
-
-        # # ------------- Position Related -------------
-        # Is around the first place in a sentence.
-        # if (position > 0 and words[position-1] == ".") or (position > 1 and words[position-2] == "."):
-        #     features['is_around_first'] = 1
-
-        # Is the last word
-        # if position == len(words) - 1:
-        #     features['is_last_word'] = 1
-
         # + Is target of restricted attribute clause. Usefulness proved.
         if position < len(words) - 2 and words[position+1] == "," and words[position+2] == "who":
             features['is_target_of_clause'] = 1
 
-        # # Is after name prefix
-        # if position < len(words) - 1 and re.match(r'M[a-z]{1,3}\.', words[position-1]):
-        #     features['is_after_name_prefix'] = 1
+        # - Tend not to be names
+        if get_non_name_bool():
+            features['is_likely_none_name'] = 1
 
-        # + Is in possessive case
-        # if position < len(words) -1 and words[position+1] == "'s":
-        #     features['is_possessive'] = 1
+        """
+                if previous_label == 'PERSON':
+            features['is_previous_person'] = 1
 
-        # if words[position+1] == "verb":
-        #     features['is_after_verb'] = 1
+        if previous_label == 'O':
+            features['is_previous_other'] = 1
 
-        # if words[position - 1] in stop_words:
-        #     features['is_after_stop_word'] = 1
-        #
-        # if not position >= len(words) - 1 and words[position + 1] in stop_words:
-        #     features['is_before_stop_word'] = 1
+        # ------------- Position Related -------------
+        Is around the first place in a sentence.
+        if (position > 0 and words[position-1] == ".") or (position > 1 and words[position-2] == "."):
+            features['is_around_first'] = 1
+
+        Is the last word
+        if position == len(words) - 1:
+            features['is_last_word'] = 1
 
 
+
+        # Is after name prefix
+        if position < len(words) - 1 and re.match(r'M[a-z]{1,3}\.', words[position-1]):
+            features['is_after_name_prefix'] = 1
+
+        + Is in possessive case
+        if position < len(words) -1 and words[position+1] == "'s":
+            features['is_possessive'] = 1
+
+        if words[position+1] == "verb":
+            features['is_after_verb'] = 1
+
+        if words[position - 1] in stop_words:
+            features['is_after_stop_word'] = 1
+
+        if not position >= len(words) - 1 and words[position + 1] in stop_words:
+            features['is_before_stop_word'] = 1
+        """
 
         # =============== TODO: Done ================#
         return features
