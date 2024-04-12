@@ -160,9 +160,15 @@ class MEMM:
                 features[feature_name] = 1
 
         # ---------- Library elements ---------- #
+        # Is the start of a sentence
+        if (position > 0 and words[position - 1] == '.') or position == 0:
+            features['is_start_of_sentence'] = 1
+
         # Is in name list. Usefulness proved.
         if current_word in stored_names:
             features['is_in_name_list'] = 1
+
+        # Previous word is in name list. 
 
         # + Is target of restricted attribute clause. Usefulness proved.
         if (
