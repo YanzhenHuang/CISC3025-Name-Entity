@@ -78,7 +78,7 @@ stored_names = names.words('male.txt') + names.words('female.txt')
 pattern_features = {
 
     # + Start with Capital-lowercase, and the rest letters are lowercase.
-    'p_cap_low': re.compile(r'[A-Z](\'|[A-Z])?[a-z]+'),
+    'p_cap_low': re.compile(r'^[A-Z](\'|[A-Z])?[a-z]+'),
 
     # + Single capital letter followed by a period. e.g. D., L., ... Initials of human name.
     'p_cap_period': re.compile(r'^[A-Z]\.$'),
