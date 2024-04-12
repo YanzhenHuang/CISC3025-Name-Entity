@@ -166,8 +166,8 @@ class MEMM:
 
         # + Is target of restricted attribute clause. Usefulness proved.
         if (
-            (position < len(words) - 2 and words[position+1] == "," and words[position+2] == "who") or
-            (position < len(words) - 3 and words[position+2] == "," and words[position+3] == "who")
+            (position < len(words) - 2 and words[position+1] == "," and (words[position+2] == "who" or words[position+2] == "whose")) or
+            (position < len(words) - 3 and words[position+2] == "," and (words[position+3] == "who" or words[position+3] == "whose"))
         ):
             features['is_target_of_clause'] = 1
 
