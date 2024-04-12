@@ -125,18 +125,17 @@ class MEMM:
         :param position: the word you are adding features for
         """
 
-        def get_non_name_bool():
+        def is_something_else():
             non_name_bool = (
                 # Week names: Monday, Tuesday, ...
                 current_word.upper() in week_names or current_word.upper() in month_names or
                 # Month Names: January, February, ...
                 current_word.upper() in week_names or current_word.upper() in month_names or
 
-                # Is location name: Country + City
-                # "China" matches "People's Republic of China"
-                (any(current_word.upper() in country_name for country_name in country_names) or
-                    current_word.upper() in city_names
-                ) or
+                # Is location name: Country + City. "China" matches "People's Republic of China"
+                any(current_word.upper() in country_name for country_name in country_names) or
+
+                current_word.upper() in city_names or
 
                 # Stop words: prep, adj, ...
                 current_word in stop_words
@@ -170,7 +169,7 @@ class MEMM:
             features['is_target_of_clause'] = 1
 
         # - Tend not to be names
-        if get_non_name_bool():
+        if is_something_else():
             features['is_likely_none_name'] = 1
 
         """
@@ -294,24 +293,6 @@ class MEMM:
 
     # Predict the single entity.
     def predict_entities(self, sentence):
-        # def tokenize_sentence(_sentence):
-        #     tokenizer = nltk.tokenize.RegexpTokenizer(r'[\s]+', gaps=True)
-        #
-        #     # Unify Punctuation
-        #     _sentence = re.sub(r'\"|\.\.+|\(|\)|\s--+\s|(?<=[A-Za-z])/|&[a-z]+;|>', ' ', _sentence)
-        #     _sentence = re.sub(r'(?<![A-Z])([.,?!"]\s+)', ' ', _sentence)
-        #
-        #     # Tokenize using unified punctuation
-        #     _token_array = tokenizer.tokenize(_sentence)
-        #
-        #     # Post-process
-        #     token_array = []
-        #     for token in _token_array:
-        #         token = token.rstrip(',?!"-.')
-        #         token = token.lower()
-        #         token_array.append(token) if token != "-" or "" else None
-        #
-        #     return token_array
 
         # Pre-process
         words = sentence.split()
