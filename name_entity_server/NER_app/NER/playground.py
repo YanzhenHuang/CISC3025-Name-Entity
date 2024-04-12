@@ -11,14 +11,16 @@ def predict(input_sentence, model_py_file, model_pkl_dir=None):
         with open(model_pkl_dir, 'rb') as f:
             memm.classifier = pickle.load(f)
 
-    predicted_labels = memm.predict_entities(input_sentence)
+    predicted_labels, token_list = memm.predict_entities(input_sentence)
     names = ""
     debug_predicted_label = ""
 
     # Output Prediction
     print(input_sentence)
     print("Names are: ", end=" ")
-    for word, label in zip(input_sentence.split(), predicted_labels):
+
+
+    for word, label in zip(token_list, predicted_labels):
         if label == 'PERSON':
             print(word, end=", ")
             names += '<span style="background-color: #bce7ac">' + "<b>" + word + "</b>" + "</span>" + " · "
