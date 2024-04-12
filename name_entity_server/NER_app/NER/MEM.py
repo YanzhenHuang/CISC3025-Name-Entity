@@ -302,20 +302,34 @@ class MEMM:
 
     # Predict the single entity.
     def predict_entities(self, sentence):
+        punctuation = ['.', ',', '?', '!']
+
+        def split_words_with_punctuation(_words):
+            updated_words = []
+            for _word in _words:
+                if _word[-1] in punctuation:
+                    _punc = _word[-1]
+                    _word = _word.rstrip(_word[-1])
+                    updated_words.append(_word)
+                    updated_words.append(_punc)
+                else:
+                    updated_words.append(_word)
+
+            return updated_words
 
         # Pre-process
-        words = sentence.split()
-        # words = tokenize_sentence(sentence)
+        _words = sentence.split()
+        token_list = split_words_with_punctuation(_words)
 
         # Initialize the previous label to be 'O'
         previous_label = 'O'
 
         # Classify each label
         predicted_labels = []
-        for position, word in enumerate(words):
-            features = self.features(words, previous_label, position)
+        for position, word in enumerate(token_list):
+            features = self.features(token_list, previous_label, position)
             predicted_label = self.classifier.classify(features)  # Decide the label
             predicted_labels.append(predicted_label)
             previous_label = predicted_label
 
-        return predicted_labels
+        return predicted_labels, token_list
