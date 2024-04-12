@@ -154,23 +154,26 @@ class MEMM:
 
         # ===== TODO: Add your features here ======= #
 
-        # ---------- Language Matches ---------- #
+        # ---------- Pattern Matches ---------- #
         for feature_name, feature_pattern in pattern_features.items():
             if re.match(feature_pattern, current_word):
                 features[feature_name] = 1
 
         # ---------- Library elements ---------- #
-        # Is in name list
+        # Is in name list. Usefulness proved.
         if current_word in stored_names:
             features['is_in_name_list'] = 1
 
         # + Is target of restricted attribute clause. Usefulness proved.
-        if position < len(words) - 2 and words[position+1] == "," and words[position+2] == "who":
+        if (
+            (position < len(words) - 2 and words[position+1] == "," and words[position+2] == "who") or
+            (position < len(words) - 3 and words[position+2] == "," and words[position+3] == "who")
+        ):
             features['is_target_of_clause'] = 1
 
         # - Tend not to be names
         if is_something_else():
-            features['is_likely_none_name'] = 1
+            features['is_sth_else'] = 1
 
         """
                 if previous_label == 'PERSON':
