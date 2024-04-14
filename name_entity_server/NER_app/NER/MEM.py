@@ -10,7 +10,6 @@
 import re
 import os
 import pickle
-import pycountry
 import geonamescache
 
 # NLP Packages
