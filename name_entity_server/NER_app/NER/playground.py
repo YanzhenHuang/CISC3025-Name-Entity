@@ -19,7 +19,6 @@ def predict(input_sentence, model_py_file, model_pkl_dir=None):
     print(input_sentence)
     print("Names are: ", end=" ")
 
-
     for word, label in zip(token_list, predicted_labels):
         if label == 'PERSON':
             print(word, end=", ")
