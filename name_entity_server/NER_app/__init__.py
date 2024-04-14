@@ -9,6 +9,7 @@ required_nltk_corpuses = ['names', 'stopwords', 'verbnet']
 def nltk_download():
     if not DO_NLTK_DOWNLOAD:
         return
+    print("Start downloading required NLTK packages....")
 
     if platform.system() == 'Darwin':
         # I have to disable ssl in case you use Mac computers.
