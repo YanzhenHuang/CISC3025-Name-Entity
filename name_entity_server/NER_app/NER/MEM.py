@@ -7,7 +7,6 @@
 # Created Date : April 4th 2020, 17:45:05
 # Last Modified: April 4th 2020, 17:45:05
 # --------------------------------------------------
-
 import re
 import os
 import pickle
@@ -78,7 +77,7 @@ stored_names = names.words('male.txt') + names.words('female.txt')
 pattern_features = {
 
     # + Start with Capital-lowercase, and the rest letters are lowercase.
-    'p_cap_low': re.compile(r'^[A-Z](\'|[A-Z])?[a-z]+'),
+    'p_cap_low': re.compile(r'^[A-Z](\'[A-Z]?|[a-z][A-Z])?[a-z]+'),
 
     # + Single capital letter followed by a period. e.g. D., L., ... Initials of human name.
     'p_cap_period': re.compile(r'^[A-Z]\.$'),
@@ -128,9 +127,9 @@ class MEMM:
         def is_something_else():
             non_name_bool = (
                 # Week names: Monday, Tuesday, ...
-                current_word.upper() in week_names or current_word.upper() in month_names or
+                current_word.upper() in week_names or
                 # Month Names: January, February, ...
-                current_word.upper() in week_names or current_word.upper() in month_names or
+                current_word.upper() in month_names or
 
                 # Is location name: Country + City. "China" matches "People's Republic of China"
                 any(current_word.upper() in country_name for country_name in country_names) or
@@ -154,21 +153,24 @@ class MEMM:
 
         # ===== TODO: Add your features here ======= #
 
-        # ---------- Pattern Matches ---------- #
+        # ---------- Pattern Features ---------- #
         for feature_name, feature_pattern in pattern_features.items():
             if re.match(feature_pattern, current_word):
                 features[feature_name] = 1
 
-        # ---------- Library elements ---------- #
-        # Is the start of a sentence
-        if (position > 0 and words[position - 1] == '.') or position == 0:
-            features['is_start_of_sentence'] = 1
-
+        # ---------- Library Features ---------- #
         # Is in name list. Usefulness proved.
         if current_word in stored_names:
             features['is_in_name_list'] = 1
 
-        # Previous word is in name list. 
+        # - Tend not to be names
+        if is_something_else():
+            features['is_sth_else'] = 1
+
+        # --------- Contextual Features --------- #
+        # Is the start of a sentence
+        if (position > 0 and words[position - 1] == '.') or position == 0:
+            features['is_start_of_sentence'] = 1
 
         # + Is target of restricted attribute clause. Usefulness proved.
         if (
@@ -176,10 +178,6 @@ class MEMM:
             (position < len(words) - 3 and words[position+2] == "," and (words[position+3] == "who" or words[position+3] == "whose"))
         ):
             features['is_target_of_clause'] = 1
-
-        # - Tend not to be names
-        if is_something_else():
-            features['is_sth_else'] = 1
 
         """
                 if previous_label == 'PERSON':
