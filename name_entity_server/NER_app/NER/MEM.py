@@ -168,6 +168,7 @@ class MEMM:
             features['is_sth_else'] = 1
 
         # --------- Contextual Features --------- #
+        human_status = ['Mr.', 'Ms.', 'Mrs.', 'Dr.', 'Prof.']
         # Is the start of a sentence
         if (position > 0 and words[position - 1] == '.') or position == 0:
             features['is_start_of_sentence'] = 1
@@ -178,6 +179,10 @@ class MEMM:
             (position < len(words) - 3 and words[position+2] == "," and (words[position+3] == "who" or words[position+3] == "whose"))
         ):
             features['is_target_of_clause'] = 1
+
+        # + Is after Mr., Ms., Mrs., Dr., Prof.
+        if position > 0 and words in human_status:
+            features['is_after_status'] = 1
 
         """
                 if previous_label == 'PERSON':
