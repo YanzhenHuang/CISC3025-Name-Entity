@@ -189,9 +189,9 @@ class MEMM:
         if position > 0 and words[position - 1] in human_status:
             features['is_after_status'] = 1
 
-        # + Is before a verb
-        if position < len(words) - 1 and p_stemmer.stem(words[position + 1]) in verbs:
-            features['is_after_verb'] = 1
+        # + Is before a verb: This feature plays a negative role! Don't add it.
+        #if position < len(words) - 1 and p_stemmer.stem(words[position + 1]) in verbs:
+        #    features['is_after_verb'] = 1
 
         """
                 if previous_label == 'PERSON':
