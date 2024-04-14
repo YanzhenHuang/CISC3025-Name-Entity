@@ -15,11 +15,14 @@ import geonamescache
 
 # NLP Packages
 import nltk.sem.chat80
-from nltk.corpus import stopwords
+from nltk.corpus import stopwords, verbnet
 from nltk.classify.maxent import MaxentClassifier
 from sklearn.metrics import (accuracy_score, fbeta_score, precision_score,
                              recall_score)
 from nltk.corpus import names
+from nltk.stem import PorterStemmer
+
+p_stemmer = PorterStemmer()
 
 """ Libraries for feature selection """
 gc = geonamescache.GeonamesCache()
@@ -71,6 +74,7 @@ country_names.extend(['REPUBLIC', 'KINGDOM', 'UNITED', 'STATES'])
 
 city_names = [city['name'].upper() for city in gc.get_cities().values()] if gc else None
 stop_words = list(stopwords.words("english"))
+verbs = [p_stemmer.stem(word)for word in verbnet.lemmas()]
 stored_names = names.words('male.txt') + names.words('female.txt')
 
 """ Match Patterns """
@@ -169,6 +173,7 @@ class MEMM:
 
         # --------- Contextual Features --------- #
         human_status = ['Mr.', 'Ms.', 'Mrs.', 'Dr.', 'Prof.']
+
         # Is the start of a sentence
         if (position > 0 and words[position - 1] == '.') or position == 0:
             features['is_start_of_sentence'] = 1
@@ -181,8 +186,12 @@ class MEMM:
             features['is_target_of_clause'] = 1
 
         # + Is after Mr., Ms., Mrs., Dr., Prof.
-        if position > 0 and words in human_status:
+        if position > 0 and words[position - 1] in human_status:
             features['is_after_status'] = 1
+
+        # + Is before a verb
+        if position < len(words) - 1 and p_stemmer.stem(words[position + 1]) in verbs:
+            features['is_after_verb'] = 1
 
         """
                 if previous_label == 'PERSON':
