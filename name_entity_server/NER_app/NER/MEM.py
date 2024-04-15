@@ -313,12 +313,12 @@ class MEMM:
 
     # Predict the single entity.
     def predict_entities(self, sentence):
-        punctuation = ['.', ',', '?', '!']
+        punctuation = [',', '?', '!']
 
         def split_words_with_punctuation(_words):
             updated_words = []
             for _word in _words:
-                if len(_word) > 3 and _word[-1] in punctuation:
+                if (len(_word) > 3 and _word[-1] == ".") or _word[-1] in punctuation:
                     _punc = _word[-1]
                     _word = _word.rstrip(_word[-1])
                     updated_words.append(_word)
