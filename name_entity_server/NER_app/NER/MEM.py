@@ -163,8 +163,8 @@ class MEMM:
 
         # ---------- Library Features ---------- #
         # Is in name list. Usefulness proved.
-        if current_word in stored_names:
-            features['is_in_name_list'] = 1
+        # if current_word in stored_names:
+        #    features['is_in_name_list'] = 1
 
         # - Tend not to be names
         if is_something_else():
