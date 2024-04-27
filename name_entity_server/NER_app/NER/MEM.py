@@ -329,8 +329,11 @@ class MEMM:
             return updated_words
 
         # Pre-process
-        _words = sentence.split()
-        token_list = split_words_with_punctuation(_words)
+        if isinstance(sentence, str):
+            _words = sentence.split()
+            token_list = split_words_with_punctuation(_words)
+        elif isinstance(sentence, list):
+            token_list = sentence
 
         # Initialize the previous label to be 'O'
         previous_label = 'O'
