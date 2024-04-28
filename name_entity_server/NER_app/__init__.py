@@ -2,7 +2,7 @@ import nltk
 import ssl
 import platform
 
-DO_NLTK_DOWNLOAD = True
+DO_NLTK_DOWNLOAD = False
 required_nltk_corpuses = ['names', 'stopwords', 'verbnet']
 
 
